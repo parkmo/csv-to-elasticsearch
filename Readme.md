@@ -1,3 +1,6 @@
+![python 3.9](https://img.shields.io/badge/python-3.9-blue)
+![elasticsearch 7.4.0](https://img.shields.io/badge/elasticsearch-7.4.0-blue)
+
 # CSV-File to elasticsearch
 
 Import a CSV-File to ElasticSearch.
