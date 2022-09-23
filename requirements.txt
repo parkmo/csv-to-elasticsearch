@@ -1,0 +1,11 @@
+certifi
+elastic-transport
+elasticsearch
+elasticsearch7
+elasticsearch8
+numpy
+pandas
+python-dateutil
+pytz
+six
+urllib3
