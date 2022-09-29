@@ -12,6 +12,12 @@ if __name__ == '__main__':
     parser.add_argument('--csvfile', required=True, type=argparse.FileType('r', encoding='utf-8'),
                         help='path to csv-file to import - encoding utf-8')
 
+    parser.add_argument('--csv-save', required=False, action='store_true'
+                        , default=False, help='csv update and save')
+    parser.add_argument('--with-test', required=False, type=bool
+                        , default=False, help='Run with test')
+    parser.add_argument('--only-test', required=False, action='store_true'
+                        , default=False, help='Only test')
     parser.add_argument('--elastic-host', required=False, type=str,
                         default='http://localhost:9200',
                         help='elasticsearch host ( default http://localhost:9200 )')
@@ -46,8 +52,14 @@ if __name__ == '__main__':
     csv_mod.load()
     csv_mod.modifiy(args.ignore_columns, args.id_column)
     csv_mod.save()
+    if ( args.csv_save ):
+        csv_mod.save()
     csv_to_elastic.elastic_setup(args.elastic_host)
 
     csv_to_elastic.test_elastic()
+    if ( args.only_test or args.with_test ):
+        csv_to_elastic.test_elastic()
+        if ( args.only_test ):
+            sys.exit(0)
 #    csv_to_elastic.import_to_elastic_from_csv(csv_mod.csvfile, args.elastic_index, csv_mod.delimiter)
     csv_to_elastic.import_to_elastic_from_dict(csv_mod.get_dict(), args.elastic_index)

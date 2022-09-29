@@ -48,7 +48,8 @@ def load():
     print(f"Describe CSV:\n {data.describe(include='all')} \n")
     if ( add_timestamp != None ):
         if ( add_timestamp == "{isoformat}" ):
-            data['@timestamp']=datetime.today().isoformat()
+            # astimezone() => + "+01:00"
+            data['@timestamp']=datetime.today().astimezone().isoformat()
         else:
             data['@timestamp']=add_timestamp
     if ( len(add_columns) > 0 ):
