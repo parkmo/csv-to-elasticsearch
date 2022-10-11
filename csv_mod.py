@@ -2,6 +2,7 @@
 import pandas as pd
 import sys
 from datetime import datetime
+from distutils.version import LooseVersion#, StrictVersion
 
 csvfile = ''
 delimiter = ';'
@@ -10,6 +11,23 @@ data = None
 dataFrameChanged = False
 add_timestamp = None
 add_columns = [ ]
+
+def validate_arguments(add_columns, cb_false = None):
+    mesg = None
+    if ( len(add_columns) > 0 ):
+        for cur_add_column in add_columns:
+            splited_cur_col = cur_add_column.split(":")
+            if ( len(splited_cur_col) != 2 ):
+                mesg = "error: add-columns has no delimiter ':'"
+                break
+            if ( len(splited_cur_col[0]) == 0 or len(splited_cur_col[1]) == 0 ):
+                mesg = "error: add-columns size 0"
+                break
+    if ( mesg != None ):
+        if (cb_false != None):
+            return False, cb_false(mesg)
+        return False, mesg
+    return True, mesg
 
 def csv_setup(Incsvfile, Indelimiter, Add_timestamp, Add_columns):
     global csvfile
@@ -32,15 +50,18 @@ def load():
     global data
     global add_timestamp
     global add_columns
+    pd_read_args = { 'filepath_or_buffer': csvfile
+            ,'encoding': "utf-8", 'delimiter': delimiter
+            ,'low_memory': False }
 
     # drop function which is used in removing or deleting rows or columns from the CSV files
-    data = pd.read_csv(csvfile,
-                       encoding="utf-8",
-                       delimiter=delimiter,
-                       #index_col=0,
-                       on_bad_lines='skip',
-                       encoding_errors='ignore',
-                       low_memory=False)
+    if ((LooseVersion(pd.__version__) <= LooseVersion("1.4.0")) == True):
+        data = pd.read_csv(**pd_read_args)
+    else:
+        data = pd.read_csv(**pd_read_args
+                       , on_bad_lines='skip'
+                       , encoding_errors='ignore'
+                       )
     if ( data.empty == True ):
         data = None
         print(" \n----- Data is emtry -----\n ")
@@ -56,8 +77,6 @@ def load():
         for cur_add_column in add_columns:
             splited_cur_col = cur_add_column.split(":")
             data[splited_cur_col[0]] = splited_cur_col[1]
-
-#    data['_index']='my_index'
 
 def get_dict():
     global data

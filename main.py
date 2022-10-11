@@ -6,6 +6,10 @@ import sys
 import csv_mod
 import csv_to_elastic
 
+def func_validate_err(mesg):
+    print(mesg)
+    sys.exit(1)
+
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='Import a CSV-File to ElasticSearch.')
 
@@ -40,23 +44,24 @@ if __name__ == '__main__':
                         default=[], nargs='+',
                         help='columns of csv to ignore for the import')
 
+    parser.add_argument('--es-version', required=False, type=str,
+                        default=None, help='"8" or "7" If it is not present and the api-key is present, it will be set to "8".')
     parser.add_argument('--add-ts', required=False, type=str,
                         default=None, help='add @timestamp "{isoformat}" or "2022-09-22 11:22:33"')
 
     parser.add_argument('--api-key', required=False, type=str,
                         default=None, help='api key')
     args = parser.parse_args()
-    csv_to_elastic.elastic_api_key = args.api_key
+    csv_mod.validate_arguments(args.add_columns, cb_false = func_validate_err)
 
     csv_mod.csv_setup(args.csvfile, args.csv_delimiter, args.add_ts, args.add_columns)
     csv_mod.load()
     csv_mod.modifiy(args.ignore_columns, args.id_column)
-    csv_mod.save()
     if ( args.csv_save ):
         csv_mod.save()
-    csv_to_elastic.elastic_setup(args.elastic_host)
+    csv_to_elastic.elastic_setup(args.elastic_host, args.api_key
+            , args.es_version)
 
-    csv_to_elastic.test_elastic()
     if ( args.only_test or args.with_test ):
         csv_to_elastic.test_elastic()
         if ( args.only_test ):
