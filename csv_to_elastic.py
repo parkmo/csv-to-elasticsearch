@@ -24,39 +24,38 @@ def elastic_setup(InElasticHost, api_key, es_version):
     else:
       from elasticsearch7 import Elasticsearch, helpers
 
-    print(" \n----- ELASTIC-Setup -----\n ")
-    print("Endpoint on '%s'" % (elastic_host))
+    g_logger.info(" \n----- ELASTIC-Setup -----\n ")
+    g_logger.info("Endpoint on '%s'" % (elastic_host))
 
 def test_elastic():
     global elastic_host
     global elastic_api_key
 
-#    print(f'elastic_api_key = [{elastic_api_key}]')
+    g_logger.debug(f'elastic_api_key = [{elastic_api_key}]')
     if ( elastic_api_key == None ):
       client = Elasticsearch(elastic_host)
     else:
       client = Elasticsearch(elastic_host, api_key = elastic_api_key)
 
     resp = client.info()
-    print(resp)
+    g_logger.info(resp)
 
 def import_to_elastic_from_dict(dict_document, index_name):
     global elastic_host
     global elastic_api_key
-    print(dict_document)
+    g_logger.info(dict_document)
 
-    print(f'Import: dict to index {index_name}')
-#    print(f'elastic_api_key = [{elastic_api_key}]')
+    g_logger.info(f'Import: dict to index {index_name}')
+    g_logger.debug(f'elastic_api_key = [{elastic_api_key}]')
     es = Elasticsearch(elastic_host, api_key = elastic_api_key)
     helpers.bulk(es, dict_document, index=index_name)
-#    helpers.bulk(es, gendata())
 
 def import_to_elastic_from_csv(file_name, index_name, delimiter):
     global elastic_host
     global elastic_api_key
 
-    print(f'Import from File: {file_name} to index {index_name}')
-#    print(f'elastic_api_key = [{elastic_api_key}]')
+    g_logger.info(f'Import from File: {file_name} to index {index_name}')
+    g_logger.debug(f'elastic_api_key = [{elastic_api_key}]')
     es = Elasticsearch(elastic_host, api_key = elastic_api_key)
     with open(file_name.name) as f:
         reader = csv.DictReader(f, delimiter=delimiter)

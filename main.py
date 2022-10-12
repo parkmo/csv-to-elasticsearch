@@ -5,9 +5,12 @@ import argparse
 import sys
 import csv_mod
 import csv_to_elastic
+import logging
+
+g_logger = None
 
 def func_validate_err(mesg):
-    print(mesg)
+    g_logger.error(mesg)
     sys.exit(1)
 
 if __name__ == '__main__':
@@ -33,6 +36,9 @@ if __name__ == '__main__':
     parser.add_argument('--csv-delimiter', required=False, type=str,
                         default=';',
                         help='csv delimiter ( default: ; )')
+    parser.add_argument('--loglevel', required=False, type=str,
+                        default='warning',
+                        help='Provide logging level. Example --loglevel debug, default=warning')
 
     parser.add_argument('--add-columns', required=False, type=str,
                         default=[], nargs='+',
@@ -50,6 +56,13 @@ if __name__ == '__main__':
                         default=None, help='api key')
     args = parser.parse_args()
     csv_mod.validate_arguments(args.add_columns, cb_false = func_validate_err)
+    g_logger = logging.getLogger(__name__)
+    FORMAT = '[%(asctime)s] %(message)s'
+    logging.basicConfig(format=FORMAT)
+    g_logger.setLevel(level=args.loglevel.upper())
+    g_logger.info("Start CSV to ES")
+    csv_to_elastic.g_logger = g_logger
+    csv_mod.g_logger = g_logger
 
     csv_mod.csv_setup(args.csvfile, args.csv_delimiter, args.add_ts, args.add_columns)
     csv_mod.load()

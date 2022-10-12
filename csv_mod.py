@@ -39,12 +39,11 @@ def csv_setup(Incsvfile, Indelimiter, Add_timestamp, Add_columns):
     add_timestamp = Add_timestamp
     global add_columns
     add_columns = Add_columns
-
-    print(" \n----- CSV-Setup -----\n ")
-    print("CSV-File %s with delimiter %s'" % (csvfile, delimiter))
+    g_logger.info(" \n----- CSV-Setup -----\n ")
+    g_logger.info("CSV-File %s with delimiter %s'" % (csvfile, delimiter))
 
 def load():
-    print(" \n----- LOAD AND CHECK CSV -----\n ")
+    g_logger.info(" \n----- LOAD AND CHECK CSV -----\n ")
     global csvfile
     global delimiter
     global data
@@ -64,9 +63,9 @@ def load():
                        )
     if ( data.empty == True ):
         data = None
-        print(" \n----- Data is emtry -----\n ")
+        g_logger.critical(" \n----- Data is emtry -----\n ")
         sys.exit()
-    print(f"Describe CSV:\n {data.describe(include='all')} \n")
+    g_logger.info(f"Describe CSV:\n {data.describe(include='all')} \n")
     if ( add_timestamp != None ):
         if ( add_timestamp == "{isoformat}" ):
             # astimezone() => + "+01:00"
@@ -83,24 +82,24 @@ def get_dict():
     return data.to_dict(orient='records')
 
 def save():
-    print(" \n----- SAVE CSV -----\n ")
+    g_logger.info(" \n----- SAVE CSV -----\n ")
     global data
     global dataFrameChanged 
 
     if dataFrameChanged is True:
-        print(f"Result - first Rows: \n {data.head(2)} \n")
+        g_logger.info(f"Result - first Rows: \n {data.head(2)} \n")
         csvfile = 'mod_' + str(csvfile.name)
         pd.DataFrame.to_csv(data, csvfile, sep=delimiter, encoding='utf-8')
 
-    print(f"Describe CSV:\n {data.describe(include='all')} \n")
+    g_logger.debug(f"Describe CSV:\n {data.describe(include='all')} \n")
 
 def modifiy(deleteColumns, idColumn):
-    print(" \n----- MODIFY AND CHECK CSV -----\n ")
-    print("Columns to ignore %s'" % (deleteColumns))
-    print("Column for id %s'" % (idColumn))
     global data
     global dataFrameChanged 
-    print(f"Describe CSV:\n {data.describe(include='all')} \n")
+    g_logger.info(" \n----- MODIFY AND CHECK CSV -----\n ")
+    g_logger.info("Columns to ignore %s'" % (deleteColumns))
+    g_logger.info("Column for id %s'" % (idColumn))
+    g_logger.debug(f"Describe CSV:\n {data.describe(include='all')} \n")
 
     if idColumn is not None:
         data.set_index(idColumn, inplace=True)
@@ -109,12 +108,12 @@ def modifiy(deleteColumns, idColumn):
     else:
         data.index.name = 'line'
 
-    print(f"First Rows: \n {data.head(2)} \n")
+    g_logger.info(f"First Rows: \n {data.head(2)} \n")
 
     ignoreColumns = 0
     for column in deleteColumns:
         data.drop(column, inplace=True, axis=1, errors='ignore')
         ignoreColumns += 1
     if ignoreColumns > 0:
-        print(f"dropped {ignoreColumns} columns to ignore")
+        g_logger.info(f"dropped {ignoreColumns} columns to ignore")
         dataFrameChanged = True
