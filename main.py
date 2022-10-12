@@ -22,17 +22,14 @@ if __name__ == '__main__':
                         , default=False, help='Run with test')
     parser.add_argument('--only-test', required=False, action='store_true'
                         , default=False, help='Only test')
+    parser.add_argument('--elastic-index', required=True, type=str,
+                        help='elasticsearch index')
     parser.add_argument('--elastic-host', required=False, type=str,
                         default='http://localhost:9200',
                         help='elasticsearch host ( default http://localhost:9200 )')
-
-    parser.add_argument('--elastic-index', required=True, type=str,
-                        help='elasticsearch index')
-
     parser.add_argument('--id-column', required=False, type=str,
                         default=None,
                         help='elasticsearch uses the _id with the data of this given csv-column')
-
     parser.add_argument('--csv-delimiter', required=False, type=str,
                         default=';',
                         help='csv delimiter ( default: ; )')
