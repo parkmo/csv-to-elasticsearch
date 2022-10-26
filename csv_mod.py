@@ -17,7 +17,7 @@ def validate_arguments(add_columns, cb_false = None):
     if ( len(add_columns) > 0 ):
         for cur_add_column in add_columns:
             splited_cur_col = cur_add_column.split(":")
-            if ( len(splited_cur_col) != 2 ):
+            if ( len(splited_cur_col) < 2 ):
                 mesg = "error: add-columns has no delimiter ':'"
                 break
             if ( len(splited_cur_col[0]) == 0 or len(splited_cur_col[1]) == 0 ):
@@ -75,7 +75,9 @@ def load():
     if ( len(add_columns) > 0 ):
         for cur_add_column in add_columns:
             splited_cur_col = cur_add_column.split(":")
-            data[splited_cur_col[0]] = splited_cur_col[1]
+            key = splited_cur_col[0]
+            value = ":".join(splited_cur_col[1:])
+            data[key] = value
 
 def get_dict():
     global data
