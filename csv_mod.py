@@ -11,6 +11,7 @@ data = None
 dataFrameChanged = False
 add_timestamp = None
 add_columns = [ ]
+rename_columns_dict = { }
 
 def validate_arguments(add_columns, cb_false = None):
     mesg = None
@@ -29,7 +30,7 @@ def validate_arguments(add_columns, cb_false = None):
         return False, mesg
     return True, mesg
 
-def csv_setup(Incsvfile, Indelimiter, Add_timestamp, Add_columns):
+def csv_setup(Incsvfile, Indelimiter, Add_timestamp, Add_columns, Rename_columns):
     global csvfile
     csvfile = Incsvfile
 
@@ -39,6 +40,8 @@ def csv_setup(Incsvfile, Indelimiter, Add_timestamp, Add_columns):
     add_timestamp = Add_timestamp
     global add_columns
     add_columns = Add_columns
+    global rename_columns_dict
+    rename_columns_dict = makeRenameDict(Rename_columns)
     g_logger.info(" \n----- CSV-Setup -----\n ")
     g_logger.info("CSV-File %s with delimiter %s'" % (csvfile, delimiter))
 
@@ -79,6 +82,17 @@ def load():
             value = ":".join(splited_cur_col[1:])
             data[key] = value
 
+def makeRenameDict(lst_columns):
+    dict_ret = { }
+    if ( len(lst_columns) > 0 ):
+        for cur_column in lst_columns:
+            splited_cur_col = cur_column.split(":")
+            key = splited_cur_col[0]
+            value = ":".join(splited_cur_col[1:])
+            dict_ret[key] = value
+    return dict_ret
+
+
 def get_dict():
     global data
     return data.to_dict(orient='records')
@@ -98,10 +112,14 @@ def save():
 def modifiy(deleteColumns, idColumn):
     global data
     global dataFrameChanged 
+    global rename_columns_dict
     g_logger.info(" \n----- MODIFY AND CHECK CSV -----\n ")
     g_logger.info("Columns to ignore %s'" % (deleteColumns))
     g_logger.info("Column for id %s'" % (idColumn))
     g_logger.debug(f"Describe CSV:\n {data.describe(include='all')} \n")
+    if ( len(rename_columns_dict) > 0 ):
+        data.rename(columns = rename_columns_dict, inplace = True)
+        dataFrameChanged = True
 
     if idColumn is not None:
         data.set_index(idColumn, inplace=True)

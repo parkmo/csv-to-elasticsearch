@@ -43,6 +43,9 @@ if __name__ == '__main__':
     parser.add_argument('--add-columns', required=False, type=str,
                         default=[], nargs='+',
                         help='add columns. A:B C:D')
+    parser.add_argument('--rename-columns', required=False, type=str,
+                        default=[], nargs='+',
+                        help='rename columns. A:B C:D')
     parser.add_argument('--ignore-columns', required=False, type=str,
                         default=[], nargs='+',
                         help='columns of csv to ignore for the import')
@@ -56,6 +59,7 @@ if __name__ == '__main__':
                         default=None, help='api key')
     args = parser.parse_args()
     csv_mod.validate_arguments(args.add_columns, cb_false = func_validate_err)
+    csv_mod.validate_arguments(args.rename_columns, cb_false = func_validate_err)
     g_logger = logging.getLogger(__name__)
     FORMAT = '[%(asctime)s] %(message)s'
     logging.basicConfig(format=FORMAT)
@@ -64,7 +68,7 @@ if __name__ == '__main__':
     csv_to_elastic.g_logger = g_logger
     csv_mod.g_logger = g_logger
 
-    csv_mod.csv_setup(args.csvfile, args.csv_delimiter, args.add_ts, args.add_columns)
+    csv_mod.csv_setup(args.csvfile, args.csv_delimiter, args.add_ts, args.add_columns, args.rename_columns)
     csv_mod.load()
     csv_mod.modifiy(args.ignore_columns, args.id_column)
     if ( args.csv_save ):
