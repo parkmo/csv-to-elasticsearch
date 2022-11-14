@@ -97,14 +97,21 @@ def get_dict():
     global data
     return data.to_dict(orient='records')
 
-def save():
+def save(optype):
     g_logger.info(" \n----- SAVE CSV -----\n ")
+    global csvfile
     global data
     global dataFrameChanged 
 
     if dataFrameChanged is True:
         g_logger.info(f"Result - first Rows: \n {data.head(2)} \n")
-        csvfile = 'mod_' + str(csvfile.name)
+        if ( optype == 'new' ):
+            csvfile = 'mod_' + str(csvfile.name)
+        elif ( optype == 'update' ):
+            csvfile = str(csvfile.name)
+        else:
+            g_logger.error(f" \n----- CSV-Save type Error [{optype}] -----\n ")
+            return
         pd.DataFrame.to_csv(data, csvfile, sep=delimiter, encoding='utf-8')
 
     g_logger.debug(f"Describe CSV:\n {data.describe(include='all')} \n")

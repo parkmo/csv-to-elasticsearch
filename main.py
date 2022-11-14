@@ -19,8 +19,8 @@ if __name__ == '__main__':
     parser.add_argument('--csvfile', required=True, type=argparse.FileType('r', encoding='utf-8'),
                         help='path to csv-file to import - encoding utf-8')
 
-    parser.add_argument('--csv-save', required=False, action='store_true'
-                        , default=False, help='csv update and save')
+    parser.add_argument('--csv-save', required=False, type=str
+                        , default=False, help='csv [ update | new ]')
     parser.add_argument('--with-test', required=False, type=bool
                         , default=False, help='Run with test')
     parser.add_argument('--only-test', required=False, action='store_true'
@@ -72,7 +72,7 @@ if __name__ == '__main__':
     csv_mod.load()
     csv_mod.modifiy(args.ignore_columns, args.id_column)
     if ( args.csv_save ):
-        csv_mod.save()
+        csv_mod.save(args.csv_save)
     csv_to_elastic.elastic_setup(args.elastic_host, args.api_key
             , args.es_version)
 
