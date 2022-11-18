@@ -112,7 +112,7 @@ def save(optype):
         else:
             g_logger.error(f" \n----- CSV-Save type Error [{optype}] -----\n ")
             return
-        pd.DataFrame.to_csv(data, csvfile, sep=delimiter, encoding='utf-8')
+        pd.DataFrame.to_csv(data, csvfile, index_label = False, sep=delimiter, encoding='utf-8')
 
     g_logger.debug(f"Describe CSV:\n {data.describe(include='all')} \n")
 
