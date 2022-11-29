@@ -1,6 +1,6 @@
 # csv_mod.py
 import pandas as pd
-import sys
+import sys, os
 from datetime import datetime
 from distutils.version import LooseVersion#, StrictVersion
 
@@ -54,7 +54,9 @@ def load():
     global add_columns
     pd_read_args = { 'filepath_or_buffer': csvfile
             ,'encoding': "utf-8", 'delimiter': delimiter
-            ,'low_memory': False }
+            ,'low_memory': False
+            ,'keep_default_na': ""
+            }
 
     # drop function which is used in removing or deleting rows or columns from the CSV files
     if ((LooseVersion(pd.__version__) <= LooseVersion("1.4.0")) == True):
@@ -106,13 +108,15 @@ def save(optype):
     if dataFrameChanged is True:
         g_logger.info(f"Result - first Rows: \n {data.head(2)} \n")
         if ( optype == 'new' ):
-            csvfile = 'mod_' + str(csvfile.name)
+            csvfile = str(csvfile.name)
+            pname, fname = os.path.split(csvfile)
+            csvfile = pname + '/mod_' + fname
         elif ( optype == 'update' ):
             csvfile = str(csvfile.name)
         else:
             g_logger.error(f" \n----- CSV-Save type Error [{optype}] -----\n ")
             return
-        pd.DataFrame.to_csv(data, csvfile, index_label = False, sep=delimiter, encoding='utf-8')
+        pd.DataFrame.to_csv(data, csvfile, index = False, sep=delimiter, encoding='utf-8')
 
     g_logger.debug(f"Describe CSV:\n {data.describe(include='all')} \n")
 
