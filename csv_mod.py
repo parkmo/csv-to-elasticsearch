@@ -110,6 +110,8 @@ def save(optype):
         if ( optype == 'new' ):
             csvfile = str(csvfile.name)
             pname, fname = os.path.split(csvfile)
+            if (pname == "" ):
+                pname = "."
             csvfile = pname + '/mod_' + fname
         elif ( optype == 'update' ):
             csvfile = str(csvfile.name)
