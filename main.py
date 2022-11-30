@@ -13,6 +13,12 @@ def func_validate_err(mesg):
     g_logger.error(mesg)
     sys.exit(1)
 
+def make_resultfile(args):
+    if ( args.make_result ):
+        result_filename = str(args.csvfile.name) + ".result"
+        f = open(result_filename, "w")
+        f.close()
+
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='Import a CSV-File to ElasticSearch.')
 
@@ -21,7 +27,7 @@ if __name__ == '__main__':
 
     parser.add_argument('--csv-save', required=False, type=str
                         , default=False, help='csv [ update | new ]')
-    parser.add_argument('--with-test', required=False, type=bool
+    parser.add_argument('--with-test', required=False, action='store_true'
                         , default=False, help='Run with test')
     parser.add_argument('--only-test', required=False, action='store_true'
                         , default=False, help='Only test')
@@ -50,6 +56,8 @@ if __name__ == '__main__':
                         default=[], nargs='+',
                         help='columns of csv to ignore for the import')
 
+    parser.add_argument('--make-result', required=False, type=int
+                        , default=0, help='Make Result file ({csv-file}.result)')
     parser.add_argument('--es-version', required=False, type=str,
                         default=None, help='"8" or "7" If it is not present and the api-key is present, it will be set to "8".')
     parser.add_argument('--add-ts', required=False, type=str,
@@ -82,3 +90,5 @@ if __name__ == '__main__':
             sys.exit(0)
 #    csv_to_elastic.import_to_elastic_from_csv(csv_mod.csvfile, args.elastic_index, csv_mod.delimiter)
     csv_to_elastic.import_to_elastic_from_dict(csv_mod.get_dict(), args.elastic_index)
+    make_resultfile(args)
+
