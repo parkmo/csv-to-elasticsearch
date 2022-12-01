@@ -31,6 +31,34 @@ def elastic_setup(InElasticHost, api_key, es_version):
     g_logger.info(" \n----- ELASTIC-Setup -----\n ")
     g_logger.info("Endpoint on '%s'" % (elastic_host))
 
+def make_match_dict_m(document_fields):
+    lst_match = [ ]
+    for cur_doc_field in document_fields:
+        dict_match = { }
+        dict_match['match_phrase'] = { }
+        splited_filed = cur_doc_field.split(":")
+        key = splited_filed[0]
+        value = ":".join(splited_filed[1:])
+        dict_match['match_phrase'][key] = value
+        lst_match.append(dict_match)
+    return lst_match
+
+def check_exists_m(index, document_fields, should_match = 0):
+    global elastic_host
+    global elastic_api_key
+    g_logger.info(f'index {index} {document_fields}')
+    g_logger.debug(f'elastic_api_key = [{elastic_api_key}]')
+    es = Elasticsearch(elastic_host, api_key = elastic_api_key)
+    lst_match = make_match_dict_m(document_fields)
+    if ( should_match == 0 ):
+        should_match = len(lst_match)
+    resp = es.search(index = index,
+            query = { "bool": { "should": lst_match , "minimum_should_match": should_match } }
+            )
+    g_logger.debug(f'{resp}')
+    print(len(resp['hits']['hits']))
+    return len(resp['hits']['hits'])
+
 def make_match_dict_1(document_fields):
     dict_match = { }
     for cur_doc_field in document_fields:
@@ -61,8 +89,8 @@ def error_func():
 if __name__ == '__main__':
     dict_cmd_func = {
             None: error_func
-            , 'chkexist': check_exists_1
-#            , 'chkexistm': check_exists_m
+#            , 'chkexist': check_exists_1
+            , 'chkexist': check_exists_m
             }
 
     g_logger = logging.getLogger(__name__)
