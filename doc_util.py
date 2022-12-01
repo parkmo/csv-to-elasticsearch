@@ -52,8 +52,12 @@ def check_exists_m(index, document_fields, should_match = 0):
     lst_match = make_match_dict_m(document_fields)
     if ( should_match == 0 ):
         should_match = len(lst_match)
+        query = { "bool": { "must": lst_match } }
+    else:
+        query = { "bool": { "should": lst_match , "minimum_should_match": should_match } }
+
     resp = es.search(index = index,
-            query = { "bool": { "should": lst_match , "minimum_should_match": should_match } }
+            query = query
             )
     g_logger.debug(f'{resp}')
     print(len(resp['hits']['hits']))
