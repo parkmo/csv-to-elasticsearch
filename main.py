@@ -35,7 +35,7 @@ if __name__ == '__main__':
                         help='elasticsearch index')
     parser.add_argument('--elastic-host', required=False, type=str,
                         default='http://localhost:9200',
-                        help='elasticsearch host ( default http://localhost:9200 )')
+                        help='elasticsearch host ( default http://localhost:9200 ), ( none not use es )')
     parser.add_argument('--id-column', required=False, type=str,
                         default=None,
                         help='elasticsearch uses the _id with the data of this given csv-column')
@@ -81,6 +81,8 @@ if __name__ == '__main__':
     csv_mod.modifiy(args.ignore_columns, args.id_column)
     if ( args.csv_save ):
         csv_mod.save(args.csv_save)
+    if ( args.elastic_host.lower() == "none" ):
+        sys.exit(0)
     csv_to_elastic.elastic_setup(args.elastic_host, args.api_key
             , args.es_version)
 
